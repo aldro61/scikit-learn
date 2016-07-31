@@ -494,7 +494,9 @@ class FeatureUnion(BaseEstimator, TransformerMixin):
         """
         result = Parallel(n_jobs=self.n_jobs)(
             delayed(_fit_transform_one)(trans, name, X, y,
-                                        self.transformer_weights, **fit_params)
+                                        self.transformer_weights, **dict([(k[len(name) + 2:],v)
+                                                                          for k, v in six.iteritems(fit_params)
+                                                                          if k.split("__")[0] == name]))
             for name, trans in self.transformer_list)
 
         Xs, transformers = zip(*result)
